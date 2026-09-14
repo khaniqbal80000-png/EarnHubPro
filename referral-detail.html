@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Timeline - EarnHub PRO</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#FBF9F5] text-[#2D251E] font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-white">
+
+    <!-- Navbar Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-xl sm:text-2xl font-black text-amber-800">EarnHub <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">PRO</span></span>
+            </div>
+            <a href="referral.html" class="bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold px-4 py-2 rounded-xl text-xs transition border border-stone-300 flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-arrow-left"></i> Back to Referrals
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Tracking Details Content -->
+    <main class="max-w-2xl mx-auto w-full p-4 sm:p-8 flex-grow my-6 sm:my-10">
+        <div class="bg-white border border-stone-200 p-6 sm:p-10 rounded-3xl shadow-sm space-y-8">
+            
+            <!-- User Title & Earning Banner -->
+            <div class="border-b border-stone-200 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <span class="text-xs uppercase font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">Anti-Fraud Pipeline</span>
+                    <h1 id="friendNameDisplay" class="text-2xl sm:text-3xl font-black text-stone-900 mt-2">Loading Referee...</h1>
+                    <p class="text-xs text-stone-500 mt-1">Live 3-Step Green Track Verification Status</p>
+                </div>
+                <div class="bg-stone-50 border border-stone-200 p-4 rounded-2xl text-center sm:text-right w-full sm:w-auto">
+                    <p class="text-[10px] uppercase font-bold text-stone-400">Commission Earned</p>
+                    <p id="friendCommissionDisplay" class="text-xl sm:text-2xl font-black text-emerald-700 mt-0.5">₹0.00</p>
+                </div>
+            </div>
+
+            <!-- 3-Step Visual Timeline Container -->
+            <div id="timelineBox" class="space-y-8 relative border-l-2 border-amber-600 ml-4 sm:ml-6 pl-6 sm:pl-8">
+                <!-- Dynamically injected via JavaScript -->
+            </div>
+
+            <!-- Footer Action Button -->
+            <div class="border-t border-stone-200 pt-6 text-center">
+                <a href="referral.html" class="inline-block bg-amber-700 hover:bg-amber-800 text-white font-bold px-8 py-3.5 rounded-xl text-sm transition shadow-lg">Return to Command Center</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <header class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
+        &copy; 2026 EarnHub PRO. Secure Live Tracking System.
+    </header>
+
+    <!-- Page Script Logic -->
+    <script>
+        window.onload = function() {
+            // Read parameters passed from referral.html URL
+            const params = new URLSearchParams(window.location.search);
+            const name = params.get('name') || 'Friend';
+            const status = params.get('status') || 'pending';
+            const date1 = params.get('date1') || 'Recent';
+            const date2 = params.get('date2') || 'Recent';
+            const date3 = params.get('date3') || 'Pending';
+
+            document.getElementById('friendNameDisplay').innerText = `${name}'s Live Timeline`;
+
+            const timelineBox = document.getElementById('timelineBox');
+            const commDisplay = document.getElementById('friendCommissionDisplay');
+
+            if(status === 'verified') {
+                commDisplay.innerText = '₹11.25';
+                timelineBox.innerHTML = `
+                    <div class="relative">
+                        <div class="absolute -left-[37px] sm:-left-[41px] top-0 w-4.5 sm:w-5 h-4.5 sm:h-5 bg-emerald-600 rounded-full border-4 border-white shadow-md"></div>
+                        <h3 class="font-bold text-sm sm:text-base text-stone-900">Step 1: Invite Link Signup</h3>
+                        <p class="text-stone-500 text-xs mt-0.5">Successfully registered using your referral invite link.</p>
+                        <p class="text-stone-400 text-[11px] mt-1"><i class="fa-regular fa-clock mr-1"></i> Timestamp: ${date1}</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-[37px] sm:-left-[41px] top-0 w-4.5 sm:w-5 h-4.5 sm:h-5 bg-emerald-600 rounded-full border-4 border-white shadow-md"></div>
+                        <h3 class="font-bold text-sm sm:text-base text-stone-900">Step 2: Profile Demographics Setup</h3>
+                        <p class="text-stone-500 text-xs mt-0.5">Completed onboarding and submitted all 12 basic demographic questions.</p>
+                        <p class="text-stone-400 text-[11px] mt-1"><i class="fa-regular fa-clock mr-1"></i> Timestamp: ${date2}</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-[37px] sm:-left-[41px] top-0 w-4.5 sm:w-5 h-4.5 sm:h-5 bg-emerald-600 rounded-full border-4 border-white shadow-md"></div>
+                        <h3 class="font-bold text-sm sm:text-base text-emerald-700">Step 3: First Survey Completed (Green Verified 🎉)</h3>
+                        <p class="text-stone-500 text-xs mt-0.5">Successfully finished their first brand survey. Commission unlocked and credited!</p>
+                        <p class="text-stone-400 text-[11px] mt-1"><i class="fa-regular fa-clock mr-1"></i> Timestamp: ${date3}</p>
+                    </div>
+                `;
+            } else {
+                commDisplay.innerText = '₹0.00 (Pending)';
+                timelineBox.innerHTML = `
+                    <div class="relative">
+                        <div class="absolute -left-[37px] sm:-left-[41px] top-0 w-4.5 sm:w-5 h-4.5 sm:h-5 bg-emerald-600 rounded-full border-4 border-white shadow-md"></div>
+                        <h3 class="font-bold text-sm sm:text-base text-stone-900">Step 1: Invite Link Signup</h3>
+                        <p class="text-stone-500 text-xs mt-0.5">Successfully registered using your referral invite link.</p>
+                        <p class="text-stone-400 text-[11px] mt-1"><i class="fa-regular fa-clock mr-1"></i> Timestamp: ${date1}</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-[37px] sm:-left-[41px] top-0 w-4.5 sm:w-5 h-4.5 sm:h-5 bg-amber-600 rounded-full border-4 border-white shadow-md"></div>
+                        <h3 class="font-bold text-sm sm:text-base text-stone-900">Step 2: Profile Demographics Setup</h3>
+                        <p class="text-stone-500 text-xs mt-0.5">Completed onboarding profile form.</p>
+                        <p class="text-stone-400 text-[11px] mt-1"><i class="fa-regular fa-clock mr-1"></i> Timestamp: ${date2}</p>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute -left-[37px] sm:-left-[41px] top-0 w-4.5 sm:w-5 h-4.5 sm:h-5 bg-stone-300 rounded-full border-4 border-white shadow-md"></div>
+                        <h3 class="font-bold text-sm sm:text-base text-amber-700">Step 3: First Survey Completion (Pending ⏳)</h3>
+                        <p class="text-stone-500 text-xs mt-0.5">User has not completed their first survey yet. Commission is on hold.</p>
+                        <p class="text-stone-400 text-[11px] mt-1"><i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i> Awaiting survey activity...</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

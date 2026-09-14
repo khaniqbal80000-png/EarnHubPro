@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surveys Feed - EarnHub PRO</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#FBF9F5] text-[#2D251E] font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-white">
+
+    <!-- Navbar -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-xl sm:text-2xl font-black text-amber-800">EarnHub <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">PRO</span></span>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold">
+                <a href="dashboard.html" class="text-amber-800 border-b-2 border-amber-700 pb-1 transition">Live Surveys</a>
+                <a href="referral.html" class="text-stone-600 hover:text-amber-800 transition">My Referrals</a>
+                <a href="profile.html" class="text-stone-600 hover:text-amber-800 transition">My Profile</a>
+                <a href="wallet.html" class="text-stone-600 hover:text-amber-800 transition">Wallet</a>
+                <button onclick="logout()" class="bg-rose-50 text-rose-600 px-4 py-2 rounded-xl border border-rose-200 hover:bg-rose-100 transition">Logout</button>
+            </nav>
+
+            <button onclick="toggleMobileMenu()" class="md:hidden text-2xl text-stone-700 focus:outline-none"><i class="fa-solid fa-bars"></i></button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-stone-200 px-6 py-3 space-y-2 text-sm font-semibold shadow-lg">
+            <a href="dashboard.html" class="block py-2.5 text-amber-800 border-b border-stone-100">Live Surveys</a>
+            <a href="referral.html" class="block py-2.5 text-stone-700 border-b border-stone-100">My Referrals</a>
+            <a href="profile.html" class="block py-2.5 text-stone-700 border-b border-stone-100">My Profile</a>
+            <a href="wallet.html" class="block py-2.5 text-stone-700 border-b border-stone-100">Wallet & History</a>
+            <button onclick="logout()" class="block py-2.5 text-rose-600 font-bold">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Content -->
+    <main class="max-w-5xl mx-auto w-full p-4 sm:p-6 flex-grow my-4 sm:my-6 space-y-6">
+
+        <!-- Welcome Banner & Wallet Quick Widget -->
+        <div class="bg-gradient-to-r from-amber-700 to-orange-600 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            <div class="space-y-1">
+                <span class="bg-white/20 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Multi-Wall Engine Active</span>
+                <h1 class="text-2xl sm:text-3xl font-black mt-2">Welcome back, <span id="userNameDisplay">Earner</span>! 👋</h1>
+                <p class="text-amber-100 text-xs sm:text-sm">Switch between verified offerwalls below to find matching surveys.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl text-center w-full sm:w-auto flex-shrink-0 space-y-1">
+                <p class="text-[10px] uppercase font-bold text-amber-200 tracking-wider">Your Wallet Balance</p>
+                <p class="text-2xl font-black text-white" id="quickBalance">₹0.00</p>
+                <a href="wallet.html" class="text-[11px] text-amber-100 hover:underline inline-block mt-1">Redeem Gift Card →</a>
+            </div>
+        </div>
+
+        <!-- Multi-Wall Switcher Tabs -->
+        <div class="flex gap-2 border-b border-stone-200 pb-3 overflow-x-auto">
+            <button onclick="switchWall('cpx')" id="tabCpx" class="bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-layer-group"></i> CPX Research (Wall 1)
+            </button>
+            <button onclick="switchWall('lootably')" id="tabLootably" class="bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-bolt"></i> Lootably / Partner (Wall 2)
+            </button>
+        </div>
+
+        <!-- Wall 1: CPX Research Container (Active by Default) -->
+        <div id="wallCpx" class="bg-white border border-stone-200 p-4 sm:p-6 rounded-3xl shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-200 pb-3">
+                <div>
+                    <h2 class="text-lg font-black text-stone-900">CPX Research Offerwall</h2>
+                    <p class="text-xs text-stone-500">App ID: 36179 • High paying brand surveys</p>
+                </div>
+                <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold">Connected Live</span>
+            </div>
+            <div class="w-full overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
+                <iframe id="cpxIframe" width="100%" height="750px" frameborder="0" src=""></iframe>
+            </div>
+        </div>
+
+        <!-- Wall 2: Lootably / Partner Container (Hidden initially, ready for code) -->
+        <div id="wallLootably" class="hidden bg-white border border-stone-200 p-6 sm:p-10 rounded-3xl shadow-sm text-center space-y-4">
+            <div class="w-16 h-16 bg-amber-50 text-amber-700 rounded-3xl flex items-center justify-center text-2xl mx-auto border border-amber-200 shadow-inner">
+                <i class="fa-solid fa-rocket"></i>
+            </div>
+            <div class="max-w-md mx-auto space-y-2">
+                <h2 class="text-xl font-black text-stone-900">Second Offerwall Ready</h2>
+                <p class="text-xs text-stone-500 leading-relaxed">Aap yahan Lootably ya kisi bhi doosre network ka iframe code paste kar sakte hain taaki user ke paas surveys ka doosra bada option bhi aa jaye.</p>
+            </div>
+            <!-- Jab aapko Lootably ka code mile, aap is box mein apna iframe paste kar dena -->
+            <div class="p-4 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-xs text-stone-400 font-mono">
+                &lt;iframe src="YOUR_LOOTABLY_URL" width="100%" height="750px"&gt;&lt;/iframe&gt;
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <header class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
+        &copy; 2026 EarnHub PRO. Multi-Wall Survey Engine. All rights reserved.
+    </header>
+
+    <!-- Script Logic for Tabs and CPX Loading -->
+    <!-- Script Logic for Security, Tabs and CPX Loading -->
+    <script>
+        window.onload = function() {
+            // STRICT SECURITY: Check if user completed 12-point profile
+            const isProfileDone = localStorage.getItem('profileCompleted');
+            if(isProfileDone !== 'true') {
+                alert("⚠️ Please complete your mandatory 12-point demographic profile first to unlock the survey dashboard.");
+                window.location.href = 'profile.html';
+                return;
+            }
+
+            const name = localStorage.getItem('userName') || 'Sohail';
+            const email = localStorage.getItem('userEmail') || 'sohail@example.com';
+            const mobile = localStorage.getItem('userMobile') || '9876543210';
+
+            document.getElementById('userNameDisplay').innerText = name.split(' ')[0];
+
+            let balance = parseFloat(localStorage.getItem('walletBalance') || '0');
+            document.getElementById('quickBalance').innerText = '₹' + balance.toFixed(2);
+
+            // Load CPX Iframe dynamically with user details
+            const cpxUrl = `https://offers.cpx-research.com/index.php?app_id=36179&ext_user_id=${mobile}&username=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+            document.getElementById('cpxIframe').src = cpxUrl;
+        }
+
+        function switchWall(wallName) {
+            const tabCpx = document.getElementById('tabCpx');
+            const tabLoot = document.getElementById('tabLootably');
+            const wallCpx = document.getElementById('wallCpx');
+            const wallLoot = document.getElementById('wallLootably');
+
+            if(wallName === 'cpx') {
+                tabCpx.className = "bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0";
+                tabLoot.className = "bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0";
+                wallCpx.classList.remove('hidden');
+                wallLoot.classList.add('hidden');
+            } else {
+                tabLoot.className = "bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0";
+                tabCpx.className = "bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0";
+                wallLoot.classList.remove('hidden');
+                wallCpx.classList.add('hidden');
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        function logout() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
