@@ -91,30 +91,33 @@
     </main>
 
     <!-- Footer -->
-    <header class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
+    <footer class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
         &copy; 2026 EarnHub PRO. Referral Engine. All rights reserved.
-    </header>
+    </footer>
 
     <!-- Script Logic -->
     <script>
         window.onload = function() {
-            const mobile = localStorage.getItem('userMobile') || '9999';
+            // Fetch logged-in user identifier securely from localStorage
+            const userIdentifier = localStorage.getItem('userEmail') || localStorage.getItem('userMobile') || 'user_ref';
             const domain = window.location.origin + window.location.pathname.replace('referral.html', 'index.html');
-            document.getElementById('myRefLink').value = `${domain}?ref=${mobile}`;
+            
+            // Set dynamic referral link
+            document.getElementById('myRefLink').value = `${domain}?ref=${encodeURIComponent(userIdentifier)}`;
             
             // Check demo referral status
-            const refStatus = localStorage.getItem('ref_' + mobile + '_status');
+            const refStatus = localStorage.getItem('ref_' + userIdentifier + '_status');
             if(refStatus) {
                 document.getElementById('referralListContainer').innerHTML = `
                     <div class="p-4 bg-stone-50 border border-stone-200 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div class="space-y-1">
-                            <p class="text-sm font-bold text-stone-900">Referee: Telegram User #4092</p>
+                            <p class="text-sm font-bold text-stone-900">Referee: Telegram User</p>
                             <p class="text-xs text-amber-700 font-semibold">Current Status: ${refStatus}</p>
                         </div>
                         <span class="text-xs bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1 rounded-full font-bold">In Progress (Step 2/3)</span>
                     </div>
                 `;
-                document.getElementById('totalRefCount').innerText = "1 Referral Active";
+                document.getElementById('totalRefCount').innerText = "1 Active Referral";
             }
         }
 
@@ -126,6 +129,7 @@
         }
 
         function logout() {
+            localStorage.clear();
             window.location.href = 'index.html';
         }
     </script>
