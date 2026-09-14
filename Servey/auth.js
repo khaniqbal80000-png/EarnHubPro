@@ -10,6 +10,7 @@ async function handleSignup() {
     }
 
     const uniqueRefCode = 'EH-' + Math.floor(100000 + Math.random() * 900000);
+    // URL se aane wali referral value ko catch karna
     const referredBy = localStorage.getItem('referredBy') || localStorage.getItem('signup_ref_by') || 'direct';
 
     try {
@@ -40,7 +41,7 @@ async function handleSignup() {
 
         // 2. Insert into referrals table if user came via someone's referral link
         if (referredBy && referredBy !== 'direct') {
-            await supabaseClient
+            const { error: refError } = await supabaseClient
                 .from('referrals')
                 .insert([
                     {
@@ -52,6 +53,11 @@ async function handleSignup() {
                         commission_status: 'Pending'
                     }
                 ]);
+            
+            if (refError) {
+                console.error("❌ Referrals Insert Error:", refError.message);
+                alert("⚠️ Signup done, but referral tracking error: " + refError.message);
+            }
         }
 
         localStorage.setItem('userName', fullName);
