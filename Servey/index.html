@@ -144,7 +144,7 @@
                 <h2 class="text-3xl sm:text-4xl font-black text-stone-900 mt-4">How It Works in 3 Easy Steps</h2>
                 <p class="text-stone-600 text-sm mt-2">Get started within seconds with our frictionless onboarding flow.</p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="bg-stone-100 border border-stone-200 p-8 rounded-3xl relative shadow-sm">
                     <span class="absolute -top-4 left-8 bg-amber-700 text-white font-bold w-10 h-10 rounded-2xl flex items-center justify-center text-base shadow-md">1</span>
@@ -205,7 +205,7 @@
     <div id="authModal" class="hidden fixed inset-0 bg-stone-950/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white border border-stone-300 w-full max-w-md p-8 rounded-3xl shadow-2xl relative text-stone-900">
             <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
-            
+
             <div id="authTabsHeader" class="flex border-b border-stone-200 mb-6 pb-2 space-x-6">
                 <button id="tabLoginBtn" onclick="switchAuthMode('login')" class="font-bold text-base text-amber-800 pb-1 border-b-2 border-amber-700 transition">Login</button>
                 <button id="tabSignupBtn" onclick="switchAuthMode('signup')" class="font-bold text-base text-stone-400 pb-1 border-b-2 border-transparent transition">Sign Up</button>
@@ -269,13 +269,14 @@
         </div>
     </div>
 
-    <!-- Capture Referral ID -->
+    <!-- Capture Referral ID Script -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if (refCode) {
                 localStorage.setItem('referredBy', refCode);
+                localStorage.setItem('signup_ref_by', refCode);
             }
         });
     </script>
