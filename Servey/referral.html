@@ -167,7 +167,8 @@
             }
         }
 
-        window.onload = loadReferralData;
+        // Yeh ensure karega ki DOM load hote hi function 100% chale
+        document.addEventListener('DOMContentLoaded', loadReferralData);
 
         function copyRefLink() {
             const linkInput = document.getElementById('myRefLink');
