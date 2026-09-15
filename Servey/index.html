@@ -270,13 +270,17 @@
     </div>
 
     <!-- Capture Referral ID Script -->
+    <!-- Capture Referral ID Script -->
     <script>
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if (refCode) {
+                // SessionStorage aur LocalStorage dono mein save kar do taaki kheen se bhi miss na ho
                 localStorage.setItem('referredBy', refCode);
                 localStorage.setItem('signup_ref_by', refCode);
+                sessionStorage.setItem('referredBy', refCode);
+                console.log("Referral captured successfully:", refCode);
             }
         });
     </script>
