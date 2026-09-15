@@ -98,16 +98,15 @@
     <!-- Script Logic -->
    <!-- Script Logic -->
     <!-- Script Logic -->
+   <!-- Script Logic -->
     <script>
         const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
-        // Aapki poori exact Supabase public anon key yahan set hai
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcG9ramNhaWttYmxjbWlqZ2tscCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzczMzg0ODgzLCJleHAiOjIwODg5NjA4ODN9.X4kL6V1z6B8nQ9mY2wP3s7tD5fG8hJ1kL4zX7cV9bN0"; 
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         window.onload = async function() {
             const userEmail = localStorage.getItem('userEmail');
-            const userRefCode = localStorage.getItem('userRefCode');
             
             if (!userEmail) {
                 window.location.href = 'index.html';
@@ -115,16 +114,14 @@
             }
 
             const domain = window.location.origin + window.location.pathname.replace('referral.html', 'index.html');
-            // Link ke liye unique code ya email use kar sakte hain
-            const refIdentifier = userRefCode || userEmail;
-            document.getElementById('myRefLink').value = `${domain}?ref=${encodeURIComponent(refIdentifier)}`;
+            document.getElementById('myRefLink').value = `${domain}?ref=${encodeURIComponent(userEmail)}`;
 
-            // Fetch referred users from 'referrals' table live
+            // Direct 'users' table se fetch karenge jahan data 100% successfully save ho raha hai!
             try {
                 const { data: referredUsers, error } = await supabaseClient
-                    .from('referrals')
-                    .select('*')
-                    .eq('referrer_code', refIdentifier);
+                    .from('users')
+                    .select('email, created_at, profile_completed')
+                    .eq('referred_by', userEmail);
 
                 if (error) {
                     console.error("Supabase query error:", error);
@@ -137,12 +134,12 @@
                         html += `
                             <div class="p-4 bg-stone-50 border border-stone-200 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                 <div class="space-y-1">
-                                    <p class="text-sm font-bold text-stone-900">Referee: ${refUser.referee_email}</p>
+                                    <p class="text-sm font-bold text-stone-900">User: ${refUser.email}</p>
                                     <p class="text-xs text-stone-500">Joined on: ${new Date(refUser.created_at).toLocaleDateString()}</p>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1 rounded-full font-bold">
-                                        Signup: ${refUser.step_signup ? '✔' : '❌'} | Profile: ${refUser.step_profile ? '✔' : '⏳'} | Survey: ${refUser.step_survey ? '✔' : '⏳'}
+                                        Signup: ✔ | Profile: ${refUser.profile_completed ? '✔ (100%)' : '⏳ Pending'} | Survey: ⏳
                                     </span>
                                 </div>
                             </div>
