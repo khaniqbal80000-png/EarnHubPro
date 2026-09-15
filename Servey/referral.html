@@ -31,6 +31,11 @@
     <!-- Main Content -->
     <main class="max-w-5xl mx-auto w-full p-4 sm:p-6 flex-grow my-4 sm:my-6 space-y-6">
 
+        <!-- DEBUG STATUS BOX (Ye batayega ki script kahan ruki) -->
+        <div id="debugBox" class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-xs font-mono text-blue-800">
+            Status: Initializing script...
+        </div>
+
         <!-- Banner -->
         <div class="bg-gradient-to-r from-amber-700 to-orange-600 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="space-y-2">
@@ -41,25 +46,6 @@
             <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl text-center w-full md:w-auto flex-shrink-0 space-y-1">
                 <p class="text-[10px] uppercase font-bold text-amber-200">Total Referral Earnings</p>
                 <p class="text-2xl font-black text-white" id="refEarnings">₹0.00</p>
-            </div>
-        </div>
-
-        <!-- 3-Step Milestone Rules Box -->
-        <div class="bg-white border border-stone-200 p-6 rounded-3xl shadow-sm space-y-4">
-            <h2 class="text-base font-black text-stone-900">How Referral Commission Works (3-Step Rule)</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                <div class="bg-stone-50 border border-stone-200 p-4 rounded-2xl space-y-1">
-                    <span class="font-bold text-amber-700">Step 1: Signup</span>
-                    <p class="text-stone-500">Friend joins using your unique Telegram referral link.</p>
-                </div>
-                <div class="bg-stone-50 border border-stone-200 p-4 rounded-2xl space-y-1">
-                    <span class="font-bold text-amber-700">Step 2: Profile 100%</span>
-                    <p class="text-stone-500">Friend fills out all 12 demographic profile parameters.</p>
-                </div>
-                <div class="bg-stone-50 border border-stone-200 p-4 rounded-2xl space-y-1">
-                    <span class="font-bold text-amber-700">Step 3: 1st Survey</span>
-                    <p class="text-stone-500">Friend successfully completes their first live survey and gets credited.</p>
-                </div>
             </div>
         </div>
 
@@ -95,26 +81,34 @@
         &copy; 2026 EarnHub PRO. Referral Engine. All rights reserved.
     </footer>
 
-    <!-- Script Logic -->
+    <!-- Script Logic with Visible Debugger -->
     <script>
+        const debug = (msg) => {
+            console.log(msg);
+            const box = document.getElementById('debugBox');
+            if(box) box.innerText = "Status: " + msg;
+        };
+
         const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl"; 
 
-        function initReferralEngine() {
-            // Check if Supabase CDN is loaded, if not wait 50ms and check again
+        function runEngine() {
             if (typeof window.supabase === 'undefined') {
-                setTimeout(initReferralEngine, 50);
+                debug("Waiting for Supabase CDN...");
+                setTimeout(runEngine, 50);
                 return;
             }
 
-            const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            debug("Supabase loaded. Checking localStorage...");
             const userEmail = localStorage.getItem('userEmail');
-            console.log("Loading referrals for:", userEmail);
             
             if (!userEmail) {
-                window.location.href = 'index.html';
+                debug("ERROR: No userEmail found in localStorage! Redirecting...");
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
                 return;
             }
+
+            debug("Found email: " + userEmail + ". Fetching from database...");
 
             const domain = window.location.origin + window.location.pathname.replace('referral.html', 'index.html');
             const refLinkInput = document.getElementById('myRefLink');
@@ -122,17 +116,19 @@
                 refLinkInput.value = `${domain}?ref=${encodeURIComponent(userEmail)}`;
             }
 
+            const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
             supabaseClient
                 .from('referrals')
                 .select('*')
                 .eq('referrer_code', userEmail)
                 .then(({ data: referredUsers, error }) => {
                     if (error) {
-                        console.error("Supabase query error:", error);
+                        debug("Supabase Error: " + JSON.stringify(error));
                         return;
                     }
 
-                    console.log("Fetched Referrals:", referredUsers);
+                    debug("Fetched successfully! Total rows: " + (referredUsers ? referredUsers.length : 0));
 
                     const container = document.getElementById('referralListContainer');
                     const countElem = document.getElementById('totalRefCount');
@@ -156,23 +152,20 @@
                         });
                         if (container) container.innerHTML = html;
                         if (countElem) countElem.innerText = `${referredUsers.length} Active Referrals`;
+                        debug("SUCCESS: Data rendered on screen!");
                     } else {
                         if (container) {
-                            container.innerHTML = `
-                                <div class="p-6 text-center text-stone-400 text-xs border border-dashed border-stone-200 rounded-2xl">
-                                    No referrals tracked yet. Share your link!
-                                </div>
-                            `;
+                            container.innerHTML = `<div class="p-6 text-center text-stone-400 text-xs border border-dashed border-stone-200 rounded-2xl">No referrals tracked yet.</div>`;
                         }
                         if (countElem) countElem.innerText = `0 Active Referrals`;
+                        debug("Query completed, but 0 referrals found for this email.");
                     }
                 }).catch(err => {
-                    console.error("Error fetching referrals:", err);
+                    debug("Catch Error: " + err.message);
                 });
         }
 
-        // Start checking and loading instantly
-        initReferralEngine();
+        runEngine();
 
         function copyRefLink() {
             const linkInput = document.getElementById('myRefLink');
