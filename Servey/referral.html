@@ -95,20 +95,14 @@
         &copy; 2026 EarnHub PRO. Referral Engine. All rights reserved.
     </footer>
 
-    <!-- Script Logic (Executed Immediately) -->
     <!-- Script Logic -->
     <script>
         const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl"; 
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function loadReferralData() {
-            // Wait until Supabase CDN is fully loaded
-            if (typeof window.supabase === 'undefined') {
-                setTimeout(loadReferralData, 100);
-                return;
-            }
-
-            const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             const userEmail = localStorage.getItem('userEmail');
             console.log("Loading referrals for:", userEmail);
             
@@ -173,8 +167,8 @@
             }
         }
 
-        // Trigger on load
-        window.addEventListener('load', loadReferralData);
+        // Call directly when script runs
+        loadReferralData();
 
         function copyRefLink() {
             const linkInput = document.getElementById('myRefLink');
