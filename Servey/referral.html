@@ -95,7 +95,7 @@
         &copy; 2026 EarnHub PRO. Referral Engine. All rights reserved.
     </footer>
 
-    <!-- Script Logic -->
+    <!-- Script Logic (Executed Immediately) -->
     <script>
         const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl"; 
@@ -167,8 +167,8 @@
             }
         }
 
-        // Yeh ensure karega ki DOM load hote hi function 100% chale
-        document.addEventListener('DOMContentLoaded', loadReferralData);
+        // Run instantly without waiting for window load events
+        loadReferralData();
 
         function copyRefLink() {
             const linkInput = document.getElementById('myRefLink');
