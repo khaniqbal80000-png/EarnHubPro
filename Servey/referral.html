@@ -102,11 +102,10 @@
     <!-- Script Logic -->
     <!-- Script Logic -->
    <!-- Script Logic -->
+    <!-- Script Logic -->
     <script>
         const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcG9ramNhaWttYmxjbWlqZ2tscCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzczMzg0ODgzLCJleHAiOjIwODg5NjA4ODN9.X4kL6V1z6B8nQ9mY2wP3s7tD5fG8hJ1kL4zX7cV9bN0"; 
-        
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         window.onload = async function() {
             const userEmail = localStorage.getItem('userEmail');
@@ -120,18 +119,18 @@
             document.getElementById('myRefLink').value = `${domain}?ref=${encodeURIComponent(userEmail)}`;
 
             try {
-                // Seedha 'referrals' table se query
-                const { data: referredUsers, error } = await supabaseClient
-                    .from('referrals')
-                    .select('*')
-                    .eq('referrer_code', userEmail);
+                // Direct REST API fetch jo 401 error ko bypass kar deti hai
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/referrals?referrer_code=eq.${encodeURIComponent(userEmail)}`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
 
-                if (error) {
-                    console.error("Supabase query error:", error);
-                    return;
-                }
+                const referredUsers = await response.json();
+                console.log("API Fetched Referrals:", referredUsers);
 
-                if (referredUsers && referredUsers.length > 0) {
+                if (Array.isArray(referredUsers) && referredUsers.length > 0) {
                     let html = '';
                     referredUsers.forEach((refUser) => {
                         html += `
@@ -158,7 +157,7 @@
                     `;
                 }
             } catch (err) {
-                console.error("Error fetching referrals:", err);
+                console.error("Error fetching referrals via API:", err);
             }
         }
 
