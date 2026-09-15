@@ -100,6 +100,7 @@
     <!-- Script Logic -->
    <!-- Script Logic -->
     <!-- Script Logic -->
+    <!-- Script Logic -->
     <script>
         const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcG9ramNhaWttYmxjbWlqZ2tscCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzczMzg0ODgzLCJleHAiOjIwODg5NjA4ODN9.X4kL6V1z6B8nQ9mY2wP3s7tD5fG8hJ1kL4zX7cV9bN0"; 
@@ -108,7 +109,6 @@
 
         window.onload = async function() {
             const userEmail = localStorage.getItem('userEmail');
-            const userRefCode = localStorage.getItem('userRefCode');
             
             if (!userEmail) {
                 window.location.href = 'index.html';
@@ -119,16 +119,19 @@
             document.getElementById('myRefLink').value = `${domain}?ref=${encodeURIComponent(userEmail)}`;
 
             try {
-                // Email ya Ref Code dono se match karega taaki data turant fetch ho jaye
+                // Seedha email se query maarenge jo 100% database mein save ho rahi hai
                 const { data: referredUsers, error } = await supabaseClient
                     .from('users')
                     .select('email, created_at, profile_completed, referred_by')
-                    .or(`referred_by.eq.${userEmail},referred_by.eq.${userRefCode || ''}`);
+                    .eq('referred_by', userEmail);
 
                 if (error) {
                     console.error("Supabase query error:", error);
+                    alert("Query Error: " + error.message);
                     return;
                 }
+
+                console.log("Fetched Referrals:", referredUsers);
 
                 if (referredUsers && referredUsers.length > 0) {
                     let html = '';
