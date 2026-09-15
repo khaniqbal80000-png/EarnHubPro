@@ -105,16 +105,15 @@
     <!-- Script Logic -->
     <!-- Script Logic -->
     <!-- Script Logic -->
+   <!-- Script Logic -->
     <script>
         const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl"; 
         
-        // Global client declaration taaki kahin bhi error na aaye
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         window.onload = async function() {
             const userEmail = localStorage.getItem('userEmail');
-            console.log("Logged-in User Email:", userEmail);
             
             if (!userEmail) {
                 window.location.href = 'index.html';
@@ -134,8 +133,6 @@
                     console.error("Supabase query error:", error);
                     return;
                 }
-
-                console.log("Fetched Referrals Data:", referredUsers);
 
                 if (referredUsers && referredUsers.length > 0) {
                     let html = '';
