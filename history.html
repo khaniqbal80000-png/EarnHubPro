@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redemption History - EarnHub PRO</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#FBF9F5] text-[#2D251E] font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-white">
+
+    <!-- Navbar Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-xl sm:text-2xl font-black text-amber-800">EarnHub <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">PRO</span></span>
+            </div>
+            <a href="wallet.html" class="bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold px-4 py-2 rounded-xl text-xs transition border border-stone-300 flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-arrow-left"></i> Back to Wallet
+            </a>
+        </div>
+    </header>
+
+    <!-- Main History Content -->
+    <main class="max-w-5xl mx-auto w-full p-4 sm:p-8 flex-grow my-6">
+        <div class="bg-white border border-stone-200 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+            
+            <!-- Heading Banner -->
+            <div class="border-b border-stone-200 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <span class="text-xs uppercase font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">Transaction Vault</span>
+                    <h1 class="text-2xl sm:text-3xl font-black text-stone-900 mt-2">Redemption Requests & Status</h1>
+                    <p class="text-xs text-stone-500 mt-1">Track your gift card dispatch status and claim your secure voucher codes.</p>
+                </div>
+                <div class="bg-stone-50 border border-stone-200 px-4 py-2 rounded-2xl text-xs font-bold text-stone-700" id="totalRequestsCount">
+                    Loading Requests...
+                </div>
+            </div>
+
+            <!-- History List Container -->
+            <div id="historyTableContainer" class="overflow-x-auto">
+                <div class="p-8 text-center text-stone-400 text-xs border border-dashed border-stone-200 rounded-2xl">
+                    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching your redemption history from database...
+                </div>
+            </div>
+
+            <!-- Footer Action Button -->
+            <div class="pt-4 border-t border-stone-200 text-center">
+                <a href="wallet.html" class="inline-block bg-amber-700 hover:bg-amber-800 text-white font-bold px-8 py-3.5 rounded-xl text-sm transition shadow-lg">Return to Wallet</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
+        &copy; 2026 EarnHub PRO. Secure Transaction Engine.
+    </footer>
+
+    <!-- Script Logic (Supabase Connected) -->
+    <script>
+        const SUPABASE_URL = 'https://jppkjcaikmblcmijgklp.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        window.onload = function() {
+            fetchUserRedemptions();
+        }
+
+        async function fetchUserRedemptions() {
+            const container = document.getElementById('historyTableContainer');
+            const userEmail = localStorage.getItem('userEmail');
+
+            if (!userEmail) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-rose-500 text-xs border border-dashed border-rose-200 rounded-2xl font-bold">
+                        ⚠️ Please login first to view your redemption history.
+                    </div>
+                `;
+                document.getElementById('totalRequestsCount').innerText = "0 Requests Found";
+                return;
+            }
+
+            try {
+                // Fetch data from Supabase 'redemptions' table for logged-in user email
+                const { data, error } = await supabaseClient
+                    .from('redemptions')
+                    .select('*')
+                    .eq('user_email', userEmail)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    throw error;
+                }
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="p-8 text-center text-stone-400 text-xs border border-dashed border-stone-200 rounded-2xl">
+                            No redemption requests found. Redeem your earnings from the wallet once you reach ₹150.00!
+                        </div>
+                    `;
+                    document.getElementById('totalRequestsCount').innerText = "0 Requests Found";
+                    return;
+                }
+
+                document.getElementById('totalRequestsCount').innerText = data.length + (data.length === 1 ? ' Request Found' : ' Requests Found');
+
+                let html = `
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-stone-50 text-stone-500 uppercase border-b border-stone-200 text-[11px]">
+                                <th class="p-3">Order ID</th>
+                                <th class="p-3">Gift Card</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3">Status & Voucher Code</th>
+                                <th class="p-3">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-100 font-medium text-stone-700">
+                `;
+
+                data.forEach(item => {
+                    let statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-300 px-3 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${item.status || 'Pending'}</span>`;
+                    
+                    let codeSection = '';
+                    if (item.gift_code && item.gift_code.trim() !== '') {
+                        statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><i class="fa-solid fa-check"></i> Dispatched</span>`;
+                        codeSection = `
+                            <div class="mt-2 flex items-center gap-2 bg-stone-100 border border-stone-200 p-2 rounded-xl">
+                                <span class="font-mono font-bold text-amber-900 text-xs select-all" id="code-${item.order_id}">${item.gift_code}</span>
+                                <button onclick="copyVoucherCode('${item.gift_code}', this)" class="bg-amber-700 hover:bg-amber-800 text-white px-3 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ml-auto shadow">
+                                    <i class="fa-regular fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    // Format date nicely if available, else fallback
+                    let formattedDate = item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+
+                    html += `
+                        <tr class="hover:bg-stone-50/50">
+                            <td class="p-3 font-mono text-stone-500 text-xs">#${item.order_id}</td>
+                            <td class="p-3 font-bold text-stone-900">${item.card_brand}</td>
+                            <td class="p-3 font-black text-amber-800">₹${item.amount}.00</td>
+                            <td class="p-3">
+                                <div>${statusBadge}</div>
+                                ${codeSection}
+                            </td>
+                            <td class="p-3 text-stone-500 text-xs">${formattedDate}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+
+            } catch (err) {
+                console.error('Error loading history:', err);
+                container.innerHTML = `
+                    <div class="p-8 text-center text-rose-500 text-xs border border-dashed border-rose-200 rounded-2xl">
+                        ❌ Error loading history from database. Please refresh the page.
+                    </div>
+                `;
+            }
+        }
+
+        function copyVoucherCode(code, btn) {
+            navigator.clipboard.writeText(code).then(() => {
+                let originalHTML = btn.innerHTML;
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
+                btn.className = "bg-emerald-600 text-white px-3 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ml-auto shadow";
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.className = "bg-amber-700 hover:bg-amber-800 text-white px-3 py-1 rounded-lg text-[11px] font-bold transition flex items-center gap-1 ml-auto shadow";
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy code: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>
