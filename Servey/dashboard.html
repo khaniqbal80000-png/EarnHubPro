@@ -61,8 +61,8 @@
             <button onclick="switchWall('cpx')" id="tabCpx" class="bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0">
                 <i class="fa-solid fa-layer-group"></i> CPX Research (Wall 1)
             </button>
-            <button onclick="switchWall('lootably')" id="tabLootably" class="bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0">
-                <i class="fa-solid fa-bolt"></i> Lootably / Partner (Wall 2)
+            <button onclick="switchWall('bitlabs')" id="tabBitlabs" class="bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-bolt"></i> BitLabs (Wall 2)
             </button>
         </div>
 
@@ -80,42 +80,40 @@
             </div>
         </div>
 
-        <!-- Wall 2: Lootably / Partner Container (Hidden initially, ready for code) -->
-        <div id="wallLootably" class="hidden bg-white border border-stone-200 p-6 sm:p-10 rounded-3xl shadow-sm text-center space-y-4">
-            <div class="w-16 h-16 bg-amber-50 text-amber-700 rounded-3xl flex items-center justify-center text-2xl mx-auto border border-amber-200 shadow-inner">
-                <i class="fa-solid fa-rocket"></i>
+        <!-- Wall 2: BitLabs Container -->
+        <div id="wallBitlabs" class="hidden bg-white border border-stone-200 p-4 sm:p-6 rounded-3xl shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-200 pb-3">
+                <div>
+                    <h2 class="text-lg font-black text-stone-900">BitLabs Offerwall</h2>
+                    <p class="text-xs text-stone-500">Token Connected • Daily polls and brand surveys</p>
+                </div>
+                <span class="text-xs bg-blue-100 text-blue-800 border border-blue-300 px-3 py-1 rounded-full font-bold">Connected Live</span>
             </div>
-            <div class="max-w-md mx-auto space-y-2">
-                <h2 class="text-xl font-black text-stone-900">Second Offerwall Ready</h2>
-                <p class="text-xs text-stone-500 leading-relaxed">Aap yahan Lootably ya kisi bhi doosre network ka iframe code paste kar sakte hain taaki user ke paas surveys ka doosra bada option bhi aa jaye.</p>
-            </div>
-            <!-- Jab aapko Lootably ka code mile, aap is box mein apna iframe paste kar dena -->
-            <div class="p-4 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-xs text-stone-400 font-mono">
-                &lt;iframe src="YOUR_LOOTABLY_URL" width="100%" height="750px"&gt;&lt;/iframe&gt;
+            <div class="w-full overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
+                <iframe id="bitlabsIframe" width="100%" height="750px" frameborder="0" src=""></iframe>
             </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <header class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
+    <footer class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
         &copy; 2026 EarnHub PRO. Multi-Wall Survey Engine. All rights reserved.
-    </header>
+    </footer>
 
-    <!-- Script Logic for Tabs and CPX Loading -->
-    <!-- Script Logic for Security, Tabs and CPX Loading -->
+    <!-- Script Logic for Tabs and Iframes Loading -->
     <script>
         window.onload = function() {
-            // STRICT SECURITY: Check if user completed 12-point profile
+            // STRICT SECURITY: Check if user completed profile
             const isProfileDone = localStorage.getItem('profileCompleted');
             if(isProfileDone !== 'true') {
-                alert("⚠️ Please complete your mandatory 12-point demographic profile first to unlock the survey dashboard.");
+                alert("⚠️ Please complete your mandatory profile first to unlock the survey dashboard.");
                 window.location.href = 'profile.html';
                 return;
             }
 
-            const name = localStorage.getItem('userName') || 'Sohail';
-            const email = localStorage.getItem('userEmail') || 'sohail@example.com';
+            const name = localStorage.getItem('userName') || 'Earner';
+            const email = localStorage.getItem('userEmail') || 'user@example.com';
             const mobile = localStorage.getItem('userMobile') || '9876543210';
 
             document.getElementById('userNameDisplay').innerText = name.split(' ')[0];
@@ -126,23 +124,28 @@
             // Load CPX Iframe dynamically with user details
             const cpxUrl = `https://offers.cpx-research.com/index.php?app_id=36179&ext_user_id=${mobile}&username=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
             document.getElementById('cpxIframe').src = cpxUrl;
+
+            // Load BitLabs Iframe dynamically with token and user email
+            const bitlabsToken = "ee66e2a5-d823-4a0d-8d6e-e96c4b954308";
+            const bitlabsUrl = `https://web.bitlabs.ai/?token=${bitlabsToken}&uid=${encodeURIComponent(email)}`;
+            document.getElementById('bitlabsIframe').src = bitlabsUrl;
         }
 
         function switchWall(wallName) {
             const tabCpx = document.getElementById('tabCpx');
-            const tabLoot = document.getElementById('tabLootably');
+            const tabBit = document.getElementById('tabBitlabs');
             const wallCpx = document.getElementById('wallCpx');
-            const wallLoot = document.getElementById('wallLootably');
+            const wallBit = document.getElementById('wallBitlabs');
 
             if(wallName === 'cpx') {
                 tabCpx.className = "bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0";
-                tabLoot.className = "bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0";
+                tabBit.className = "bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0";
                 wallCpx.classList.remove('hidden');
-                wallLoot.classList.add('hidden');
+                wallBit.classList.add('hidden');
             } else {
-                tabLoot.className = "bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0";
+                tabBit.className = "bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0";
                 tabCpx.className = "bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0";
-                wallLoot.classList.remove('hidden');
+                wallBit.classList.remove('hidden');
                 wallCpx.classList.add('hidden');
             }
         }

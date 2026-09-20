@@ -37,7 +37,7 @@
             <div class="border-b border-stone-200 pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <span class="text-xs uppercase font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">Mandatory Onboarding</span>
-                    <h1 class="text-2xl sm:text-3xl font-black text-stone-900 mt-2">12-Point Demographic Hub</h1>
+                    <h1 class="text-2xl sm:text-3xl font-black text-stone-900 mt-2">My Profile</h1>
                     <p class="text-xs text-stone-500 mt-1">Please fill out your accurate details to match high-paying brand surveys.</p>
                 </div>
                 <div id="profileStatusBadge" class="bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-4 py-2 rounded-2xl">
@@ -70,7 +70,7 @@
                     <!-- 4. Gender -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase text-stone-600">4. Gender</label>
-                        <select id="pGender" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700">
+                        <select id="pGender" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700" required>
                             <option value="">Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -81,7 +81,7 @@
                     <!-- 5. Highest Education Level -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase text-stone-600">5. Highest Education Level</label>
-                        <select id="pEdu" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700">
+                        <select id="pEdu" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700" required>
                             <option value="">Select Education</option>
                             <option value="High School">High School</option>
                             <option value="College Undergraduate">College Undergraduate (Bachelor's)</option>
@@ -93,7 +93,7 @@
                     <!-- 6. Employment Status -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase text-stone-600">6. Employment Status</label>
-                        <select id="pEmp" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700">
+                        <select id="pEmp" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700" required>
                             <option value="">Select Status</option>
                             <option value="College Student">College Student</option>
                             <option value="Employed Full-Time">Employed Full-Time</option>
@@ -105,7 +105,7 @@
                     <!-- 7. Monthly Income Bracket -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase text-stone-600">7. Monthly Income Bracket</label>
-                        <select id="pInc" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700">
+                        <select id="pInc" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700" required>
                             <option value="">Select Income</option>
                             <option value="Less than ₹10,000">Less than ₹10,000</option>
                             <option value="₹10,000 - ₹25,000">₹10,000 - ₹25,000</option>
@@ -117,7 +117,7 @@
                     <!-- 8. Marital Status -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase text-stone-600">8. Marital Status</label>
-                        <select id="pMarital" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700">
+                        <select id="pMarital" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700" required>
                             <option value="">Select Status</option>
                             <option value="Single / Unmarried">Single / Unmarried</option>
                             <option value="Married">Married</option>
@@ -133,7 +133,7 @@
                     <!-- 10. Preferred Survey Niche -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase text-stone-600">10. Preferred Survey Niche</label>
-                        <select id="pNiche" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700">
+                        <select id="pNiche" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700" required>
                             <option value="">Select Niche</option>
                             <option value="Technology, Apps & Gadgets">Technology, Apps & Gadgets</option>
                             <option value="FMCG & Consumer Goods">FMCG & Consumer Goods</option>
@@ -145,7 +145,7 @@
                     <!-- 11. Daily Available Free Time -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase text-stone-600">11. Daily Available Free Time</label>
-                        <select id="pTime" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700">
+                        <select id="pTime" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700" required>
                             <option value="">Select Time</option>
                             <option value="1 - 2 Hours Daily">1 - 2 Hours Daily</option>
                             <option value="3 - 5 Hours Daily">3 - 5 Hours Daily</option>
@@ -156,7 +156,7 @@
                     <!-- 12. Primary Device Used -->
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase text-stone-600">12. Primary Device Used</label>
-                        <select id="pDevice" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700">
+                        <select id="pDevice" class="w-full bg-stone-50 border border-stone-200 px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-700" required>
                             <option value="">Select Device</option>
                             <option value="Android Smartphone">Android Smartphone</option>
                             <option value="iPhone / iOS Device">iPhone / iOS Device</option>
@@ -177,14 +177,12 @@
     </main>
 
     <!-- Footer -->
-    <header class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
+    <footer class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto">
         &copy; 2026 EarnHub PRO. Secure Demographic Engine.
-    </header>
+    </footer>
 
-    <!-- Profile Control Script -->
     <!-- Profile Control Script (Supabase Connected) -->
     <script>
-        // Initialize Supabase Client
         const SUPABASE_URL = 'https://jppkjcaikmblcmijgklp.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -199,7 +197,6 @@
             if(!savedEmail) return;
 
             try {
-                // Fetch latest profile state from Supabase database
                 const { data, error } = await supabaseClient
                     .from('users')
                     .select('*')
@@ -210,7 +207,6 @@
                     document.getElementById('profileStatusBadge').className = "bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-4 py-2 rounded-2xl";
                     document.getElementById('profileStatusBadge').innerText = "Status: 100% Completed ✅";
                     
-                    // Fill form fields if data exists
                     if(data.full_name) document.getElementById('pName').value = data.full_name;
                     if(data.email) document.getElementById('pEmail').value = data.email;
                 }
@@ -226,7 +222,6 @@
             const fullName = document.getElementById('pName').value.trim();
             const wasCompletedBefore = localStorage.getItem('profileCompleted') === 'true';
 
-            // Gather all 12 parameters
             const profilePayload = {
                 full_name: fullName,
                 p_age: document.getElementById('pAge').value,
@@ -245,12 +240,12 @@
             let currentBal = parseFloat(localStorage.getItem('walletBalance') || '0');
 
             if (!wasCompletedBefore) {
-                currentBal += 15.00; // Add ₹15 profile bonus for first-time completion
+                currentBal += 15.00;
                 profilePayload.wallet_balance = currentBal;
             }
 
             try {
-                // Update Supabase Database
+                // 1. Update users table
                 const { error } = await supabaseClient
                     .from('users')
                     .update(profilePayload)
@@ -260,6 +255,12 @@
                     alert('❌ Failed to update profile in database: ' + error.message);
                     return;
                 }
+
+                // 2. AUTOMATICALLY update step_profile in referrals table for this user!
+                await supabaseClient
+                    .from('referrals')
+                    .update({ step_profile: true })
+                    .eq('referee_email', email);
 
                 // Update local session cache
                 localStorage.setItem('userName', fullName);
@@ -272,7 +273,6 @@
                     alert("✅ Profile updated successfully in database!");
                 }
 
-                // Redirect to Dashboard
                 window.location.href = 'dashboard.html';
 
             } catch (err) {
@@ -280,6 +280,28 @@
                 alert('❌ Network error while saving profile to database.');
             }
         }
+
+        async function loadUserProfile() {
+    const userEmail = localStorage.getItem('userEmail');
+    if (!userEmail) return;
+
+    const { data, error } = await supabaseClient
+        .from('users')
+        .select('*')
+        .eq('email', userEmail)
+        .single();
+
+    if (data && !error) {
+        // Inputs mein values set karna
+        document.getElementById('signupName').value = data.full_name || '';
+        document.getElementById('signupEmail').value = data.email || '';
+        // Agar baaki demographic columns hain jaise age, gender, education, toh unki IDs ke hisaab se yahan set karein:
+        // document.getElementById('ageInput').value = data.age || '';
+        // document.getElementById('genderSelect').value = data.gender || '';
+    }
+}
+
+window.addEventListener('DOMContentLoaded', loadUserProfile);
     </script>
 </body>
 </html>

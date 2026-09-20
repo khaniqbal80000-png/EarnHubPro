@@ -1,3 +1,8 @@
+// Initialize Supabase Client for Auth
+const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // Database-Connected Signup Handler
 async function handleSignup() {
     const fullName = document.getElementById('signupName').value.trim();
@@ -41,7 +46,7 @@ async function handleSignup() {
             return;
         }
 
-        // 2. Insert into referrals table
+        // 2. Insert into referrals table cleanly without annoying alerts
         if (referredBy && referredBy !== 'direct') {
             const { error: refError } = await supabaseClient
                 .from('referrals')
@@ -58,6 +63,8 @@ async function handleSignup() {
             
             if (refError) {
                 console.error("❌ Referrals Insert Error:", refError.message);
+            } else {
+                console.log("✅ Referral tracked successfully in database!");
             }
         }
 
@@ -73,5 +80,48 @@ async function handleSignup() {
     } catch (err) {
         console.error('Database connection exception:', err);
         alert('❌ Network error connecting to database.');
+    }
+}
+
+// Database-Connected Login Handler
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!email || !password) {
+        alert('❌ Please fill in both email and password!');
+        return;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error || !data) {
+            alert('❌ User not found with this email!');
+            return;
+        }
+
+        if (data.password !== password) {
+            alert('❌ Incorrect password! Please try again.');
+            return;
+        }
+
+        // Save session locally
+        localStorage.setItem('userName', data.full_name);
+        localStorage.setItem('userEmail', data.email);
+        localStorage.setItem('walletBalance', data.wallet_balance || '0.00');
+        localStorage.setItem('profileCompleted', data.profile_completed ? 'true' : 'false');
+        localStorage.setItem('userRefCode', data.unique_ref_code || '');
+
+        alert('🎉 Login successful! Welcome back.');
+        window.location.href = 'dashboard.html';
+
+    } catch (err) {
+        console.error('Login error:', err);
+        alert('❌ Network error during login.');
     }
 }

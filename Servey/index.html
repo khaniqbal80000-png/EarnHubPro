@@ -233,11 +233,11 @@
                 <h2 class="text-xl font-bold text-stone-900">Create Free Account</h2>
                 <div>
                     <label class="block text-xs font-semibold text-stone-700 uppercase mb-1">Full Name</label>
-                    <input type="text" id="signupName" placeholder="Sohail Akhtar" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700">
+                    <input type="text" id="signupName" placeholder="Enter your full name" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-stone-700 uppercase mb-1">Email Address</label>
-                    <input type="email" id="signupEmail" placeholder="you@example.com" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700">
+                    <input type="email" id="signupEmail" placeholder="xyz@example.com" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-700">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-stone-700 uppercase mb-1">Create Password</label>
@@ -269,20 +269,60 @@
         </div>
     </div>
 
-    <!-- Capture Referral ID Script -->
-    <!-- Capture Referral ID Script -->
+    <!-- Authentication Modal & Logic Script -->
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref');
-            if (refCode) {
-                // SessionStorage aur LocalStorage dono mein save kar do taaki kheen se bhi miss na ho
-                localStorage.setItem('referredBy', refCode);
-                localStorage.setItem('signup_ref_by', refCode);
-                sessionStorage.setItem('referredBy', refCode);
-                console.log("Referral captured successfully:", refCode);
+        function openAuthModal(mode) {
+            const modal = document.getElementById('authModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                switchAuthMode(mode);
             }
-        });
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function switchAuthMode(mode) {
+            const loginContainer = document.getElementById('loginFormContainer');
+            const signupContainer = document.getElementById('signupFormContainer');
+            const forgotContainer = document.getElementById('forgotFormContainer');
+            const tabLoginBtn = document.getElementById('tabLoginBtn');
+            const tabSignupBtn = document.getElementById('tabSignupBtn');
+
+            // Hide all
+            if(loginContainer) loginContainer.classList.add('hidden');
+            if(signupContainer) signupContainer.classList.add('hidden');
+            if(forgotContainer) forgotContainer.classList.add('hidden');
+
+            if(tabLoginBtn) {
+                tabLoginBtn.classList.remove('text-amber-800', 'border-amber-700');
+                tabLoginBtn.classList.add('text-stone-400', 'border-transparent');
+            }
+            if(tabSignupBtn) {
+                tabSignupBtn.classList.remove('text-amber-800', 'border-amber-700');
+                tabSignupBtn.classList.add('text-stone-400', 'border-transparent');
+            }
+
+            if (mode === 'login') {
+                if(loginContainer) loginContainer.classList.remove('hidden');
+                if(tabLoginBtn) {
+                    tabLoginBtn.classList.add('text-amber-800', 'border-amber-700');
+                    tabLoginBtn.classList.remove('text-stone-400', 'border-transparent');
+                }
+            } else if (mode === 'signup') {
+                if(signupContainer) signupContainer.classList.remove('hidden');
+                if(tabSignupBtn) {
+                    tabSignupBtn.classList.add('text-amber-800', 'border-amber-700');
+                    tabSignupBtn.classList.remove('text-stone-400', 'border-transparent');
+                }
+            } else if (mode === 'forgot') {
+                if(forgotContainer) forgotContainer.classList.remove('hidden');
+            }
+        }
     </script>
 
     <!-- Linking Auth JavaScript File -->
