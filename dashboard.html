@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surveys Feed - EarnHub PRO</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="Earnhub 6.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .scratch-box-wrapper {
+            position: relative;
+            width: 300px;
+            height: 150px;
+            margin: 0 auto;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            background: #fffbeb;
+            border: 3px solid #f59e0b;
+            box-shadow: 0 10px 25px rgba(217, 119, 6, 0.15);
+        }
+        .scratch-prize-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            z-index: 1;
+        }
+        .scratch-canvas-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-[#FBF9F5] text-[#2D251E] font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-white pb-24 md:pb-0">
+
+    <!-- Navbar -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-xl sm:text-2xl font-black text-amber-800">EarnHub <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full border border-amber-300">PRO</span></span>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold">
+                <a href="dashboard.html" class="text-amber-800 border-b-2 border-amber-700 pb-1 transition">Surveys</a>
+                <a href="referral.html" class="text-stone-600 hover:text-amber-800 transition">Refer</a>
+                <a href="profile.html" class="text-stone-600 hover:text-amber-800 transition">My Profile</a>
+                <a href="wallet.html" class="text-stone-600 hover:text-amber-800 transition">Wallet</a>
+                <button onclick="logout()" class="bg-rose-50 text-rose-600 px-4 py-2 rounded-xl border border-rose-200 hover:bg-rose-100 transition">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Content -->
+    <main class="max-w-5xl mx-auto w-full p-4 sm:p-6 flex-grow my-4 sm:my-6 space-y-6">
+
+        <!-- Live Earnings Leaderboard Ticker -->
+        <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl flex items-center gap-3 overflow-hidden shadow-sm">
+            <span class="bg-amber-700 text-white text-[10px] font-black px-2.5 py-1 rounded-xl uppercase tracking-wider flex-shrink-0 animate-pulse">🔥 LIVE FEED</span>
+            <div class="marquee whitespace-nowrap text-xs font-bold text-amber-900 overflow-x-auto">
+                <span class="mx-4">🌟 Rahul from Jaipur completed CPX Survey & earned ₹24.50</span>
+                <span class="mx-4">⚡ Aman joined via referral link & got signup bonus</span>
+                <span class="mx-4">💎 Priya redeemed ₹50 Amazon Gift Card</span>
+                <span class="mx-4">🚀 Sohail unlocked daily scratch popup reward</span>
+            </div>
+        </div>
+
+        <!-- Welcome Banner & Wallet Quick Widget -->
+        <div class="bg-gradient-to-r from-amber-700 to-orange-600 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            <div class="space-y-1">
+                <span class="bg-white/20 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Multi-Survey Engine Active</span>
+                <h1 class="text-2xl sm:text-3xl font-black mt-2">Welcome back, <span id="userNameDisplay">Earner</span>! 👋</h1>
+                <p class="text-amber-100 text-xs sm:text-sm">Switch between verified offerwalls below to find matching surveys.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl text-center w-full sm:w-auto flex-shrink-0 space-y-1">
+                <p class="text-[10px] uppercase font-bold text-amber-200 tracking-wider">Wallet Balance</p>
+                <p class="text-2xl font-black text-white" id="quickBalance">₹0.00</p>
+                <a href="wallet.html" class="text-[11px] text-amber-100 hover:underline inline-block mt-1">Redeem Gift Cards →</a>
+            </div>
+        </div>
+
+        <!-- Scratch Card Trigger Banner -->
+        <div class="bg-white border border-stone-200 p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800 text-xl font-black flex-shrink-0 shadow-sm">
+                    🎁
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-stone-900">Daily Lucky Scratch Card</h3>
+                    <p class="text-xs text-stone-500">Tap below to open your daily 24-hour scratch card & win cash!</p>
+                </div>
+            </div>
+            <button id="openScratchBtn" onclick="openScratchModal()" class="w-full sm:w-auto bg-amber-700 hover:bg-amber-800 text-white font-bold px-6 py-3 rounded-xl text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-ticket"></i> Open Scratch Card 🎟️
+            </button>
+        </div>
+
+        <!-- Multi-Wall Switcher Tabs -->
+        <div class="flex gap-2 border-b border-stone-200 pb-3 overflow-x-auto">
+            <button onclick="switchWall('cpx')" id="tabCpx" class="bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-layer-group"></i> CPX Research
+            </button>
+            <button onclick="switchWall('bitlabs')" id="tabBitlabs" class="bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-bolt"></i> BitLabs
+            </button>
+            <button onclick="switchWall('adgem')" id="tabAdgem" class="bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0">
+                <i class="fa-solid fa-gem"></i> AdGEM
+            </button>
+        </div>
+
+        <!-- Wall 1: CPX Research Container -->
+        <div id="wallCpx" class="wall-section bg-white border border-stone-200 p-4 sm:p-6 rounded-3xl shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-200 pb-3">
+                <div>
+                    <h2 class="text-lg font-black text-stone-900">CPX Research Offerwall</h2>
+                    <p class="text-xs text-stone-500">App ID: 36179 • High paying brand surveys</p>
+                </div>
+                <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full font-bold">Connected Live</span>
+            </div>
+            <div class="w-full overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
+                <iframe id="cpxIframe" width="100%" height="750px" frameborder="0" src=""></iframe>
+            </div>
+        </div>
+
+        <!-- Wall 2: BitLabs Container -->
+        <div id="wallBitlabs" class="wall-section hidden bg-white border border-stone-200 p-4 sm:p-6 rounded-3xl shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-200 pb-3">
+                <div>
+                    <h2 class="text-lg font-black text-stone-900">BitLabs Offerwall</h2>
+                    <p class="text-xs text-stone-500">Token Connected • Daily polls and brand surveys</p>
+                </div>
+                <span class="text-xs bg-blue-100 text-blue-800 border border-blue-300 px-3 py-1 rounded-full font-bold">Connected Live</span>
+            </div>
+            <div class="w-full overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
+                <iframe id="bitlabsIframe" width="100%" height="750px" frameborder="0" src=""></iframe>
+            </div>
+        </div>
+
+        <!-- Wall 3: AdGEM Container -->
+        <div id="wallAdgem" class="wall-section hidden bg-white border border-stone-200 p-4 sm:p-6 rounded-3xl shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-200 pb-3">
+                <div>
+                    <h2 class="text-lg font-black text-stone-900">AdGEM Offerwall</h2>
+                    <p class="text-xs text-stone-500">App ID: 33658 • High-converting offers & tasks</p>
+                </div>
+                <span class="text-xs bg-purple-100 text-purple-800 border border-purple-300 px-3 py-1 rounded-full font-bold">Connected Live</span>
+            </div>
+            <div class="w-full overflow-hidden rounded-2xl border border-stone-200 bg-stone-50">
+                <iframe id="adgemIframe" width="100%" height="750px" frameborder="0" src=""></iframe>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- SCRATCH CARD POPUP MODAL -->
+    <div id="scratchModal" class="hidden fixed inset-0 bg-stone-950/70 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white border border-stone-200 w-full max-w-sm p-6 sm:p-8 rounded-3xl shadow-2xl text-center space-y-5 relative">
+            <button onclick="closeScratchModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="space-y-1">
+                <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">24-Hour Lucky Card</span>
+                <h3 class="text-xl font-black text-stone-900 mt-1">Scratch & Win Cash!</h3>
+                <p class="text-xs text-stone-500">Rub your finger or mouse over the foil to reveal prize.</p>
+            </div>
+
+            <!-- Scratch Box Wrapper -->
+            <div class="scratch-box-wrapper">
+                <!-- Prize Layer (Hidden under canvas) -->
+                <div class="scratch-prize-layer">
+                    <span class="text-[11px] font-bold text-stone-500 uppercase tracking-widest">You Won Cash</span>
+                    <h2 class="text-3xl font-black text-emerald-600 mt-1" id="modalPrizeText">₹1.00</h2>
+                    <p class="text-[10px] text-stone-500 mt-0.5">Added to your wallet!</p>
+                </div>
+                <!-- Canvas Layer (Golden Foil) -->
+                <canvas id="modalScratchCanvas" class="scratch-canvas-layer"></canvas>
+            </div>
+
+            <button onclick="closeScratchModal()" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-3 rounded-xl text-xs transition">
+                Close / Back to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Mobile Bottom Navigation Bar (App Style) -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-4 py-3 flex justify-around items-center z-50 shadow-2xl">
+        <a href="dashboard.html" class="flex flex-col items-center text-amber-800 font-bold text-[10px]">
+            <i class="fa-solid fa-house text-lg mb-0.5"></i> Surveys
+        </a>
+        <a href="referral.html" class="flex flex-col items-center text-stone-400 hover:text-amber-800 font-bold text-[10px] transition">
+            <i class="fa-solid fa-users text-lg mb-0.5"></i> Refer
+        </a>
+        <a href="wallet.html" class="flex flex-col items-center text-stone-400 hover:text-amber-800 font-bold text-[10px] transition">
+            <i class="fa-solid fa-wallet text-lg mb-0.5"></i> Wallet
+        </a>
+        <a href="profile.html" class="flex flex-col items-center text-stone-400 hover:text-amber-800 font-bold text-[10px] transition">
+            <i class="fa-solid fa-user text-lg mb-0.5"></i> Profile
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-stone-200 py-6 text-center text-xs text-stone-500 mt-auto hidden md:block">
+        &copy; 2026 EarnHub PRO. All rights reserved By Sohail Akhtar. <a href="privacy.html" class="text-amber-700 hover:underline">Privacy Policy</a> | <a href="terms.html" class="text-amber-700 hover:underline">Terms of Service</a>
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        const SUPABASE_URL = "https://jppkjcaikmblcmijgklp.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl";
+
+        let sessionReward = 1.00;
+        let isAlreadyClaimed = false;
+        let isRewardProcessed = false;
+
+        window.onload = async function() {
+            const isProfileDone = localStorage.getItem('profileCompleted');
+            if(isProfileDone !== 'true') {
+                alert("⚠️ Please complete your mandatory profile first to unlock the survey dashboard.");
+                window.location.href = 'profile.html';
+                return;
+            }
+
+            const name = localStorage.getItem('userName') || 'Earner';
+            const email = localStorage.getItem('userEmail') || 'user@example.com';
+            const mobile = localStorage.getItem('userMobile') || '9876543210';
+
+            document.getElementById('userNameDisplay').innerText = name.split(' ')[0];
+
+            let balance = parseFloat(localStorage.getItem('walletBalance') || '0');
+            document.getElementById('quickBalance').innerText = '₹' + balance.toFixed(2);
+
+            document.getElementById('cpxIframe').src = `https://offers.cpx-research.com/index.php?app_id=36179&ext_user_id=${mobile}&username=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+            document.getElementById('bitlabsIframe').src = `https://web.bitlabs.ai/?token=ee66e2a5-d823-4a0d-8d6e-e96c4b954308&uid=${encodeURIComponent(email)}`;
+            document.getElementById('adgemIframe').src = `https://api.adgem.com/v1/wall?appid=33658&playerid=${encodeURIComponent(email)}`;
+
+            // Strict range: ₹1 to ₹2 (rare 10% chance for ₹3)
+            if (Math.random() < 0.1) {
+                sessionReward = (Math.random() * (3.00 - 2.01) + 2.01).toFixed(2);
+            } else {
+                sessionReward = (Math.random() * (2.00 - 1.00) + 1.00).toFixed(2);
+            }
+
+            document.getElementById('modalPrizeText').innerText = `₹${sessionReward}`;
+
+            checkTodayScratchStatus(email);
+        }
+
+        async function checkTodayScratchStatus(email) {
+            if (!window.supabase) return;
+            const today = new Date().toISOString().split('T')[0];
+            const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            const { data: existing } = await supabaseClient
+                .from('daily_checkins')
+                .select('*')
+                .eq('user_email', email)
+                .eq('last_checkin_date', today)
+                .maybeSingle();
+
+            if (existing) {
+                isAlreadyClaimed = true;
+                isRewardProcessed = true;
+                const btn = document.getElementById('openScratchBtn');
+                btn.innerText = "Claimed Today (24h Cooldown) ✔";
+                btn.disabled = true;
+                btn.classList.add('bg-emerald-600', 'cursor-not-allowed');
+                btn.classList.remove('bg-amber-700', 'hover:bg-amber-800');
+            }
+        }
+
+        function openScratchModal() {
+            if (isAlreadyClaimed) {
+                alert("⚠️️ You have already claimed your daily reward today! Next card unlocks after 24 hours.");
+                return;
+            }
+            isRewardProcessed = false;
+            document.getElementById('scratchModal').classList.remove('hidden');
+            setTimeout(initModalCanvas, 100);
+        }
+
+        function closeScratchModal() {
+            document.getElementById('scratchModal').classList.add('hidden');
+        }
+
+        function initModalCanvas() {
+            const canvas = document.getElementById('modalScratchCanvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.style.display = 'block';
+            canvas.style.opacity = '1';
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            // Paint Solid Golden Foil Cover
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Shimmer text on foil
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillStyle = '#fef3c7';
+            ctx.textAlign = 'center';
+            ctx.fillText('✨ SCRATCH HERE WITH FINGER ✨', canvas.width / 2, canvas.height / 2 + 5);
+
+            let isDrawing = false;
+
+            function scratch(e) {
+                if (!isDrawing || isRewardProcessed) return;
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                if(!clientX || !clientY) return;
+
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 22, 0, Math.PI * 2, false);
+                ctx.fill();
+
+                // Calculate cleared percentage
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let transparentCount = 0;
+                for (let i = 3; i < imgData.data.length; i += 4) {
+                    if (imgData.data[i] < 128) transparentCount++;
+                }
+
+                if (transparentCount > (canvas.width * canvas.height) * 0.35 && !isRewardProcessed) {
+                    isRewardProcessed = true;
+                    isAlreadyClaimed = true;
+                    canvas.style.transition = 'opacity 0.4s ease';
+                    canvas.style.opacity = '0';
+                    setTimeout(() => { canvas.style.display = 'none'; }, 400);
+                    completeScratchReward();
+                }
+            }
+
+            canvas.onmousedown = () => isDrawing = true;
+            canvas.onmousemove = scratch;
+            window.onmouseup = () => isDrawing = false;
+
+            canvas.ontouchstart = (e) => { isDrawing = true; scratch(e); };
+            canvas.ontouchmove = scratch;
+            canvas.ontouchend = () => isDrawing = false;
+        }
+
+        async function completeScratchReward() {
+            const userEmail = localStorage.getItem('userEmail');
+            if (!userEmail) return;
+
+            const today = new Date().toISOString().split('T')[0];
+            const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // 1. Save in database with today's date for 24h cooldown lock
+            const { error: insertErr } = await supabaseClient
+                .from('daily_checkins')
+                .insert([{ user_email: userEmail, last_checkin_date: today, streak_count: 1 }]);
+
+            if (insertErr) {
+                console.error("DB checkin error:", insertErr);
+            }
+
+            // 2. Update local balance
+            let currentBal = parseFloat(localStorage.getItem('walletBalance') || '0');
+            currentBal += parseFloat(sessionReward);
+            localStorage.setItem('walletBalance', currentBal.toFixed(2));
+            document.getElementById('quickBalance').innerText = '₹' + currentBal.toFixed(2);
+
+            // 3. Update Supabase users table balance
+            const { error: updateErr } = await supabaseClient
+                .from('users')
+                .update({ wallet_balance: currentBal })
+                .eq('email', userEmail);
+
+            if (updateErr) {
+                console.error("DB wallet update error:", updateErr);
+            }
+
+            const btn = document.getElementById('openScratchBtn');
+            btn.innerText = "Claimed Today (24h Cooldown) ✔";
+            btn.disabled = true;
+            btn.classList.add('bg-emerald-600', 'cursor-not-allowed');
+            btn.classList.remove('bg-amber-700', 'hover:bg-amber-800');
+
+            alert(`🎉 Dhamaka! You successfully scratched and won ₹${sessionReward} added to your wallet! Next card available in 24 hours.`);
+        }
+
+        function switchWall(wallName) {
+            const tabCpx = document.getElementById('tabCpx');
+            const tabBit = document.getElementById('tabBitlabs');
+            const tabAdg = document.getElementById('tabAdgem');
+
+            const wallCpx = document.getElementById('wallCpx');
+            const wallBit = document.getElementById('wallBitlabs');
+            const wallAdg = document.getElementById('wallAdgem');
+
+            const defaultTabStyle = "bg-stone-200 hover:bg-stone-300 text-stone-700 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 flex-shrink-0";
+            const activeTabStyle = "bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 flex-shrink-0";
+
+            tabCpx.className = defaultTabStyle;
+            tabBit.className = defaultTabStyle;
+            tabAdg.className = defaultTabStyle;
+
+            wallCpx.classList.add('hidden');
+            wallBit.classList.add('hidden');
+            wallAdg.classList.add('hidden');
+
+            if(wallName === 'cpx') {
+                tabCpx.className = activeTabStyle;
+                wallCpx.classList.remove('hidden');
+            } else if(wallName === 'bitlabs') {
+                tabBit.className = activeTabStyle;
+                wallBit.classList.remove('hidden');
+            } else if(wallName === 'adgem') {
+                tabAdg.className = activeTabStyle;
+                wallAdg.classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
