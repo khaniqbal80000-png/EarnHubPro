@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Command Center - EarnHub PRO</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/png" href="Earnhub 6.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#1A1612] text-[#FBF9F5] font-sans min-h-screen flex flex-col selection:bg-amber-500 selection:text-white">
+
+    <!-- Navbar -->
+    <header class="bg-[#2D251E] border-b border-stone-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-xl font-black text-amber-500">EarnHub <span class="text-[10px] bg-amber-950 text-amber-300 px-2 py-0.5 rounded-full border border-amber-800">ADMIN PORTAL</span></span>
+            </div>
+            <div class="flex items-center space-x-4 text-xs font-semibold">
+                <span class="text-stone-400"><i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> Root Secure Access</span>
+                <a href="index.html" class="bg-stone-800 hover:bg-stone-700 text-stone-300 px-3 py-1.5 rounded-xl transition">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Admin Content -->
+    <main class="max-w-6xl mx-auto w-full p-6 flex-grow my-6 space-y-8">
+
+        <!-- Stats Overview Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="bg-[#2D251E] border border-stone-800 p-6 rounded-3xl shadow-sm space-y-1">
+                <p class="text-xs uppercase font-bold text-stone-400">Total Registered Users</p>
+                <p class="text-3xl font-black text-white" id="statTotalUsers">0</p>
+            </div>
+            <div class="bg-[#2D251E] border border-stone-800 p-6 rounded-3xl shadow-sm space-y-1">
+                <p class="text-xs uppercase font-bold text-stone-400">Pending Gift Card Requests</p>
+                <p class="text-3xl font-black text-amber-500" id="statPendingRequests">0</p>
+            </div>
+            <div class="bg-[#2D251E] border border-stone-800 p-6 rounded-3xl shadow-sm space-y-1">
+                <p class="text-xs uppercase font-bold text-stone-400">Total Platform Payouts</p>
+                <p class="text-3xl font-black text-emerald-500" id="statTotalPayouts">₹0.00</p>
+            </div>
+        </div>
+
+        <!-- Redemption Requests Management Section -->
+        <div class="bg-[#2D251E] border border-stone-800 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+            <div class="flex justify-between items-center border-b border-stone-800 pb-4">
+                <div>
+                    <h2 class="text-lg font-black text-white">Live User Redemption Requests</h2>
+                    <p class="text-xs text-stone-400">Approve requests after manual voucher code dispatch to user email.</p>
+                </div>
+                <button onclick="loadAdminData()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition">
+                    <i class="fa-solid fa-rotate mr-1"></i> Refresh Data
+                </button>
+            </div>
+
+            <div class="overflow-x-auto" id="adminRequestsContainer">
+                <div class="p-8 text-center text-stone-500 text-xs border border-dashed border-stone-800 rounded-2xl">
+                    Loading redemption requests...
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <header class="bg-[#2D251E] border-t border-stone-800 py-6 text-center text-xs text-stone-500 mt-auto">
+        &copy; 2026 EarnHub PRO. Master Administration System.
+    </header>
+
+    <!-- Admin Script Logic -->
+    <!-- Admin Script Logic (Supabase Connected) -->
+    <script>
+        // Initialize Supabase Client
+        const SUPABASE_URL = 'https://jppkjcaikmblcmijgklp.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_UcxfzJomZkwbOBz-BrZC4w_KgLoy5yl';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        window.onload = function() {
+            loadAdminData();
+        }
+
+        async function loadAdminData() {
+            try {
+                // 1. Fetch total users count from Supabase
+                const { count: userCount, error: userError } = await supabaseClient
+                    .from('users')
+                    .select('*', { count: 'exact', head: true });
+
+                document.getElementById('statTotalUsers').innerText = (userError || userCount === null) ? '0' : userCount;
+
+                // 2. Fetch all redemption requests from Supabase 'redemptions' table
+                const { data: redemptions, error: redeemError } = await supabaseClient
+                    .from('redemptions')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (redeemError) {
+                    console.error('Error fetching redemptions:', redeemError);
+                    document.getElementById('adminRequestsContainer').innerHTML = `<div class="p-8 text-center text-rose-400 text-xs border border-dashed border-stone-800 rounded-2xl">Error loading data from database.</div>`;
+                    return;
+                }
+
+                let pendingCount = redemptions.filter(i => i.status.includes('Pending')).length;
+                let totalPayout = redemptions.reduce((acc, item) => acc + (item.status.includes('Success') ? parseFloat(item.amount) : 0), 0);
+
+                document.getElementById('statPendingRequests').innerText = pendingCount;
+                document.getElementById('statTotalPayouts').innerText = '₹' + totalPayout.toFixed(2);
+
+                const container = document.getElementById('adminRequestsContainer');
+
+                if (redemptions.length === 0) {
+                    container.innerHTML = `
+                        <div class="p-8 text-center text-stone-500 text-xs border border-dashed border-stone-800 rounded-2xl">
+                            No redemption requests found in database yet.
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-stone-900 text-stone-400 uppercase border-b border-stone-800 text-[11px]">
+                                <th class="p-3">Order ID</th>
+                                <th class="p-3">User Email</th>
+                                <th class="p-3">Brand</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-800 font-medium text-stone-300">
+                `;
+
+                redemptions.forEach((item) => {
+                    let statusBadge = `<span class="bg-amber-950 text-amber-300 border border-amber-800 px-3 py-1 rounded-full text-[11px] font-bold">${item.status}</span>`;
+                    let actionBtn = `<button onclick="approveRequest('${item.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark Success</button>`;
+
+                    if(item.status.includes('Success')) {
+                        statusBadge = `<span class="bg-emerald-950 text-emerald-300 border border-emerald-800 px-3 py-1 rounded-full text-[11px] font-bold">Success & Dispatched</span>`;
+                        actionBtn = `<span class="text-stone-500 italic text-xs">Completed</span>`;
+                    }
+
+                    html += `
+                        <tr class="hover:bg-stone-900/40">
+                            <td class="p-3 font-mono text-stone-400 text-xs">#${item.order_id}</td>
+                            <td class="p-3 text-stone-200">${item.user_email}</td>
+                            <td class="p-3 font-bold text-white">${item.card_brand}</td>
+                            <td class="p-3 font-black text-amber-400">₹${item.amount}.00</td>
+                            <td class="p-3">${statusBadge}</td>
+                            <td class="p-3 text-right">${actionBtn}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+
+            } catch (err) {
+                console.error('Admin panel exception:', err);
+            }
+        }
+
+        async function approveRequest(rowId) {
+            try {
+                // Update status in Supabase database
+                const { error } = await supabaseClient
+                    .from('redemptions')
+                    .update({ status: 'Success & Dispatched' })
+                    .eq('id', rowId);
+
+                if (error) {
+                    alert('❌ Failed to update status: ' + error.message);
+                    return;
+                }
+
+                alert("✅ Request marked as Success! Voucher code dispatched status saved.");
+                loadAdminData(); // Refresh table
+
+            } catch (err) {
+                console.error('Approval exception:', err);
+                alert('❌ Network error while updating status.');
+            }
+        }
+
+        // Admin Panel Security Protection
+    function verifyAdminAccess() {
+        const adminPass = "Sohel@786"; // Yahan tu apna manchaaha secure password rakh sakta hai
+        let enteredPass = prompt("🔒 Enter Admin Security Password to Access Command Center:");
+
+        if (enteredPass !== adminPass) {
+            alert("❌ Access Denied! Incorrect password.");
+            window.location.href = "dashboard.html"; // Galat password dalne par user ko dashboard par bhej dega
+        } else {
+            alert("✅ Welcome back, Boss! Admin access granted.");
+        }
+    }
+
+    // Page load hote hi password check karega
+    window.addEventListener('DOMContentLoaded', verifyAdminAccess);
+    </script>
+</body>
+</html>
